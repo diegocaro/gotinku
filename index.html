@@ -336,11 +336,10 @@
         }
 
         if (state.searchQuery) {
-          const q = state.searchQuery.toLowerCase();
-          const matchName = (event.name || '').toLowerCase().includes(q);
-          const matchVenue = (event.venue || '').toLowerCase().includes(q);
-          const matchLocation = (event.location || '').toLowerCase().includes(q);
-          if (!matchName && !matchVenue && !matchLocation) return false;
+          const words = state.searchQuery.toLowerCase().trim().split(/\s+/);
+          const text = `${(event.name || '')} ${(event.venue || '')} ${(event.location || '')}`.toLowerCase();
+          const matchesAll = words.every(word => text.includes(word));
+          if (!matchesAll) return false;
         }
 
         return true;
