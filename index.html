@@ -3,1833 +3,580 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GoTinku — Encuentra qué hacer este fin de semana</title>
+  <title>GoTinku — Encuentra qué hacer en Chile</title>
   <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 2rem 1rem; max-width: 1100px; margin: 0 auto; }
-footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e0e0e0; font-size: 0.8rem; color: #999; text-align: center; }
-footer a { color: #888; text-decoration: none; }
-footer a:hover { text-decoration: underline; }
-h1 { font-size: 1.8rem; margin-bottom: 0.25rem; }
-.subtitle { color: #666; font-size: 0.9rem; margin-bottom: 2.5rem; }
-section { margin-bottom: 2.5rem; }
-h2 { font-size: 1.2rem; font-weight: 700; border-bottom: 2px solid #e0e0e0; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-.count { font-weight: 400; color: #888; font-size: 1rem; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-.card { background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); display: flex; flex-direction: column; gap: 0.4rem; }
-.card-header { display: flex; justify-content: space-between; align-items: center; }
-.city { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #888; }
-.date { font-size: 0.8rem; color: #555; }
-a.name { font-size: 1rem; font-weight: 600; color: #1a1a1a; text-decoration: none; }
-a.name:hover { text-decoration: underline; color: #0057ff; }
-.meta { font-size: 0.82rem; color: #555; }
-.price { color: #2a7a2a; font-weight: 500; }
-.conf-wrap { height: 3px; background: #eee; border-radius: 2px; margin-top: 0.4rem; }
-.conf { height: 100%; background: linear-gradient(90deg, #4caf50, #8bc34a); border-radius: 2px; }
-.empty { color: #999; font-style: italic; font-size: 0.9rem; }
-section:last-child .card { opacity: 0.65; }
-</style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 2rem 1rem; max-width: 1100px; margin: 0 auto; }
+    footer { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #e0e0e0; font-size: 0.8rem; color: #999; text-align: center; }
+    footer a { color: #888; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 2rem; }
+    .header-left { display: flex; align-items: baseline; gap: 0.8rem; }
+    h1 { font-size: 1.8rem; margin: 0; }
+    .subtitle { color: #666; font-size: 0.9rem; margin: 0; white-space: nowrap; }
+    .updated { color: #999; font-size: 0.8rem; text-align: right; }
+    .updated { color: #999; font-size: 0.8rem; }
+
+    /* Controls */
+    .controls { background: #fff; border-radius: 10px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .control-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+    .control-row:last-child { margin-bottom: 0; }
+
+    label { font-weight: 600; font-size: 0.9rem; }
+    select { padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; }
+    input[type="text"] { padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.9rem; flex: 1; max-width: 300px; }
+
+    /* Time window tabs - sticky at top */
+    .time-window-section {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      border-bottom: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 0.6rem 1.5rem;
+      margin-top: -1.5rem;
+      margin-bottom: 2rem;
+      z-index: 10;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      justify-content: space-between;
+    }
+    .time-window-search { flex: 0 0 280px; position: relative; display: flex; align-items: center; }
+    .time-window-search input { width: 100%; padding: 0.45rem 36px 0.45rem 0.75rem; border: 1px solid #d0d0d0; border-radius: 6px; font-size: 0.9rem; height: 36px; }
+    .search-button { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; padding: 0.4rem; color: #888; transition: all 0.2s; }
+    .search-button:hover { color: #555; }
+    .time-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: flex-end; flex: 1; align-items: center; }
+    .time-tab {
+      padding: 0.5rem 1rem;
+      background: #f0f0f0;
+      border: 2px solid transparent;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      color: #555;
+      white-space: nowrap;
+      height: 36px;
+      display: flex;
+      align-items: center;
+    }
+    .time-tab.active {
+      background: #0057ff;
+      color: #fff;
+      border-color: #0057ff;
+    }
+    .time-tab:hover:not(.active) { background: #e0e0e0; }
+    .time-tab.active:hover { background: #0047cc; }
+
+    /* Category pills */
+    .categories { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .category-pill { padding: 0.4rem 0.8rem; background: #f0f0f0; border: 1px solid #e0e0e0; border-radius: 20px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+    .category-pill:hover { background: #e0e0e0; }
+    .category-pill.active { background: #0057ff; color: #fff; border-color: #0057ff; }
+
+    /* Events grid */
+    section { margin-bottom: 2.5rem; }
+    h2 { font-size: 1.2rem; font-weight: 700; border-bottom: 2px solid #e0e0e0; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+    .count { font-weight: 400; color: #888; font-size: 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+
+    .card { background: #fff; border-radius: 10px; padding: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,.08); display: flex; flex-direction: column; gap: 0.4rem; position: relative; }
+    .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; }
+    .city { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: #888; }
+    .date { font-size: 0.8rem; color: #555; }
+    a.name { font-size: 1rem; font-weight: 600; color: #1a1a1a; text-decoration: none; }
+    a.name:hover { text-decoration: underline; color: #0057ff; }
+    .category { font-size: 0.75rem; font-weight: 600; color: #0057ff; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 0.25rem; }
+    .meta { font-size: 0.82rem; color: #555; }
+    .price { color: #2a7a2a; font-weight: 500; }
+    .confidence { font-size: 0.7rem; color: #888; text-align: right; margin-top: auto; margin-left: auto; }
+    .empty { color: #999; font-style: italic; font-size: 0.9rem; padding: 2rem 0; text-align: center; }
+    .sources { font-size: 0.75rem; color: #888; }
+
+    .card.past-event { opacity: 0.5; pointer-events: none; }
+    .card.past-event a.name { color: #999; }
+
+    /* Loading state */
+    .loading { text-align: center; padding: 3rem 1rem; font-size: 1.1rem; color: #666; }
+    .error { background: #fee; border-radius: 10px; padding: 1.5rem; color: #c00; margin-bottom: 2rem; }
+    .ai-disclaimer { background: #fff9e6; border-left: 4px solid #ff9800; padding: 1rem 1.5rem; margin-bottom: 2rem; border-radius: 6px; font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 1rem; }
+    .ai-disclaimer strong { color: #333; }
+
+    @media (max-width: 768px) {
+      body { padding: 1.5rem 1rem; }
+      h1 { font-size: 1.4rem; }
+      .header { flex-direction: column; align-items: flex-start; margin-bottom: 2rem; }
+      .header-left { flex-direction: column; gap: 0.25rem; }
+      .subtitle { white-space: normal; }
+      .updated { align-self: flex-start; margin-top: 0.5rem; }
+      .time-window-section { flex-direction: column; align-items: stretch; gap: 1rem; }
+      .time-window-search { flex: 1; }
+      .time-tabs { justify-content: flex-start; }
+      .control-row { flex-direction: column; align-items: stretch; }
+      select, input[type="text"] { width: 100%; max-width: none; }
+    }
+  </style>
 </head>
 <body>
-  <h1>GoTinku</h1>
-  <p class="subtitle">Encuentra qué hacer este fin de semana · Actualizado: 2026-06-01 18:06</p>
-  <section><h2>Esta semana <span class="count">(32)</span></h2><div class="grid">
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Desde el 19 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7m4i7KAfT/" target="_blank" rel="noopener">Ballet “La Cenicienta”</a>
-      <div class="meta">📍 Teatro </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hasta el 20 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYkW4zJDijv/" target="_blank" rel="noopener">Copas</a>
-      <div class="meta">📍 Palacio Pereira </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hasta el 19 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYkBW-bGaL8/" target="_blank" rel="noopener">Vitrina de objeto destacado: Homenaje a Carlos Muñoz Pizarro</a>
-      <div class="meta">📍 Museo Nacional de Historia Natural, Parque Quinta Normal</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Desde el 25 de mayo al 14 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYsQsbgFSKb/" target="_blank" rel="noopener">3ª Feria del Libro de Estación Central</a>
-      <div class="meta">📍 Plaza Argentina, Estación Central</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">25.05 - 14.06</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY26to7pEF5/" target="_blank" rel="noopener">Feria del Libro de Estación Central</a>
-      <div class="meta">📍 Plaza Argentina </div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hasta el 19 de julio de 2026</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0BVeqGpI1/" target="_blank" rel="noopener">Vitrina de Objeto Destacado</a>
-      <div class="meta">📍 Museo Nacional de Historia Natural </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">DEL 28 DE MAY AL 03 DE JUN 2026</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2-oSXj2Zd/" target="_blank" rel="noopener">Cartelera semanal</a>
-      <div class="meta">📍 El Biógrafo </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0UQcOgQF3/" target="_blank" rel="noopener">La Cenicienta</a>
-      <div class="meta">📍 Teatro Municipal </div>
-      <div class="meta price">🎟 desde $5.500</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 2 de agosto</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7X4ccIACF/" target="_blank" rel="noopener">Jimmy Scott, tres momentos</a>
-      <div class="meta">📍 Casa Museo Eduardo Frei Montalva, Hindenburg 683, Providencia</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 99%"><div class="conf" style="width:99%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYr3jFTlWsf/" target="_blank" rel="noopener">Ballet “La Cenicienta”</a>
-      <div class="meta">📍 Teatro Municipal </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY3PV3vhRNp/" target="_blank" rel="noopener">Un vestuario entre flores y estaciones</a>
-      
-      <div class="meta price">🎟 Desde $5.500</div>
-      <div class="conf-wrap" title="Confianza: 100%"><div class="conf" style="width:100%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYx17f3Kz5r/" target="_blank" rel="noopener">Espectáculo de máscaras de La Cenicienta</a>
-      <div class="meta">📍 Municipal de Santiago </div>
-      <div class="meta price">🎟 $5.500</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYlGuBIqaP5/" target="_blank" rel="noopener">Ballet de Santiago – La Cenicienta</a>
-      
-      <div class="meta price">🎟 $5.500</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5eoe_AcWA/" target="_blank" rel="noopener">Ensayo general del ballet “La Cenicienta”</a>
-      
-      <div class="meta price">🎟 Desde $5.500 en boleterías o municipal.cl</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hasta el 1 de noviembre</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY70q7PkeSU/" target="_blank" rel="noopener">Me lo contó un pajarito</a>
-      <div class="meta">📍 Museo Nacional de Historia Natural, Parque Quinta Normal</div>
-      <div class="meta price">🎟 entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 70%"><div class="conf" style="width:70%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo al 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYiUQr6gaGl/" target="_blank" rel="noopener">Ballet La Cenicienta</a>
-      
-      <div class="meta price">🎟 desde $5.500</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hasta el 15 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZBGzyelgr0/" target="_blank" rel="noopener">Exhibición de relatos del concurso literario del Día de los Patrimonios</a>
-      <div class="meta">📍 Cementerio General, Recoleta</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Persavictormanuel</span>
-        <span class="date">Mañana</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY_MOqDFssB/" target="_blank" rel="noopener">Franklin Fonda Especial Patrimonio</a>
-      <div class="meta">📍  San Isidro 2257</div>
-      <div class="meta price">🎟 Entrada Gratuita</div>
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">1 al 3 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY47d1yFXn2/" target="_blank" rel="noopener">Cyber Day</a>
-      <div class="meta">📍 Municipal de Santiago </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">1AL 3 DE JUNIO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY47d1yFXn2/" target="_blank" rel="noopener">Cyber Day 2026</a>
-      <div class="meta">📍 Municipal de Santiago </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Martes 2 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYf5XU5lpRC/" target="_blank" rel="noopener">Lanzamiento del Informe de Programación y Públicos 2025</a>
-      <div class="meta">📍 Cineteca Nacional de Chile </div>
-      <div class="meta price">🎟 ENTRADA LIBERADA</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 03 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY3MOFdiiKQ/" target="_blank" rel="noopener">Charla sobre la música y el cine mudo</a>
-      <div class="meta">📍 Sala de cine, Cineteca Nacional de Chile, Centro Cultural La Moneda, Nivel -2</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">3, 4, y 5 de Junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYk5iZpEesF/" target="_blank" rel="noopener">Taller Introductorio Lengua de Señas Chilena</a>
-      <div class="meta">📍 Biblioteca Nacional </div>
-      <div class="meta price">🎟 gratuito</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">5 y 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-ceHomCRy/" target="_blank" rel="noopener">Magia y Patrimonio</a>
-      <div class="meta">📍 Biblioteca Nacional, Sala América </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">5 y 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZA0-BinLTV/" target="_blank" rel="noopener">Primer Seminario de Ilusionismo</a>
-      <div class="meta">📍 Sala América </div>
-      <div class="meta price">🎟 free</div>
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Del 5 de junio al 12 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYz1MehFE3D/" target="_blank" rel="noopener">El Prestamista</a>
-      <div class="meta">📍 Teatro Centro Cultural Las Condes, Nuestra Señora del Rosario #30</div>
-      <div class="meta price">🎟 $15.000</div>
-      <div class="conf-wrap" title="Confianza: 100%"><div class="conf" style="width:100%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Viernes 05 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY8CTKuv8cs/" target="_blank" rel="noopener">Presentación escénica obra “Seca”</a>
-      <div class="meta">📍 Museo Ciudadano, Av. Vicuña Mackenna 94, Providencia</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 99%"><div class="conf" style="width:99%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Viernes 5 de junio | 10:00 a 17:00 horas</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYz29ktlTj3/" target="_blank" rel="noopener">Taller de tocados: Confección de una corona de ballet</a>
-      <div class="meta">📍 Sala Claudia Parada, Teatro Municipal de Santiago </div>
-      <div class="meta price">🎟 Gratuito</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">06 & 07 DE JUNIO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYnkhcCga3d/" target="_blank" rel="noopener">Vol. 14</a>
-      <div class="meta">📍 Espacio Londres </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">06.06 /07.06</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYqQKVEAOlR/" target="_blank" rel="noopener">Deslenguados: Jazz y vinos naturales en MUT</a>
-      <div class="meta">📍 Mercado Urbano Tobalaba, Piso 4 de MUT</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 6 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0idgWN9Ek/" target="_blank" rel="noopener">Concierto de otoño en MUT</a>
-      <div class="meta">📍 Piso 3 MUT </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 6 de junio 2026</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2wGy8x-kn/" target="_blank" rel="noopener">Magnolia Recorder Consort</a>
-      <div class="meta">📍 Museo del Sonido, Huérfanos 2919, Barrio Yungay</div>
-      <div class="meta price">🎟 entrada liberada con aporte voluntario</div>
-      <div class="conf-wrap" title="Confianza: 99%"><div class="conf" style="width:99%"></div></div>
-    </div></div></section>
-  <section><h2>Próximos <span class="count">(10)</span></h2><div class="grid">
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Lunes 8 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5PPbJGKnW/" target="_blank" rel="noopener">Donación de obra de Kitty Goldmann</a>
-      <div class="meta">📍 Sala Ercilla, Biblioteca Nacional, Alameda 651</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Martes 9 de junio - 19:00 horas</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpg1XSlTPY/" target="_blank" rel="noopener">Claire Huangci recital</a>
-      <div class="meta">📍 Teatro Municipal, Santiago</div>
-      <div class="meta price">🎟 $3.500</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">entre el 10 y el 12 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYfgR1BkXJe/" target="_blank" rel="noopener">Festival SENTIDOS</a>
-      <div class="meta">📍 Cineteca Nacional de Chile </div>
-      <div class="meta price">🎟 ENTRADAS GRATUITAS</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">12 y 13 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYiAyoiFTgl/" target="_blank" rel="noopener">Concierto 4: Fantástica</a>
-      <div class="meta">📍 Orquesta Filarmónica de Santiago </div>
-      <div class="meta price">🎟 $4.500</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">13 DE JUNIO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7gY1voE2w/" target="_blank" rel="noopener">Mundial Social – Chile y México, territorio mundial por un fútbol social</a>
-      <div class="meta">📍 Cineteca Nacional de Chile </div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Huechuraba</span>
-        <span class="date">Desde el 19 de junio al 3 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0SlSmRM_q/" target="_blank" rel="noopener">Órbita Sonora</a>
-      <div class="meta">📍 Planetario Huechuraba </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Huechuraba</span>
-        <span class="date">Desde el 19 de junio al 3 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0SlSmRM_q/" target="_blank" rel="noopener">Órbita Sonora – Interstellar</a>
-      <div class="meta">📍 Planetario Huechuraba </div>
-      
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">23 de junio → 30 de junio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYnkwLLEQnY/" target="_blank" rel="noopener">Brasil Moderno</a>
-      <div class="meta">📍 Palacio Errázuriz — Embajada de Brasil </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">02 de julio → 26 de julio</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYnkwLLEQnY/" target="_blank" rel="noopener">Brasil Moderno</a>
-      <div class="meta">📍 Mercado Urbano Tobalaba — MUT </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Del 30/07 al 02/08</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2fw9tmK9g/" target="_blank" rel="noopener">StgoFoto Feria</a>
-      <div class="meta">📍 Centro Cultural La Moneda </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div></div></section>
-  <section><h2>Pasados <span class="count">(121)</span></h2><div class="grid">
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-ePb8EZwb/" target="_blank" rel="noopener">Cine en Chile. Historia(s) en movimiento</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYkQPTTlnmA/" target="_blank" rel="noopener">Taller de Ilustración “Habitar Origen y Destino: Recorrido y creación desde Geografías Paralelas”</a>
-      <div class="meta">📍 Museo Ciudadano </div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5KufBtCnR/" target="_blank" rel="noopener">Concierto Coral Día de los Patrimonios</a>
-      <div class="meta">📍 Biblioteca Nacional, Av. Alameda Libertador Bernardo O’Higgins 651</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Punta Arenas</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7Y7DcEr_C/" target="_blank" rel="noopener">Día del Patrimonio Cultural</a>
-      <div class="meta">📍  Roca #826, punta arenas</div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Valparaíso</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY4hucRgIZj/" target="_blank" rel="noopener">Archivo de la Sociedad Unión y Protección de Obreras</a>
-      <div class="meta">📍 Vigía #431, Playa Ancha, Valparaíso, Vigía #431, Playa Ancha, Valparaíso</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzvvnOsL6n/" target="_blank" rel="noopener">Charla: Proceso de restauración de la escultura “El Último Regazo”</a>
-      <div class="meta">📍 Acceso Recoleta – Crematorio, Cementerio General, Cementerio General</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">La Florida</span>
-        <span class="date">este domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY8LI1rkWoD/" target="_blank" rel="noopener">Visita al Seminario Pontificio Mayor de Santiago</a>
-      <div class="meta">📍 Seminario Pontificio Mayor de Santiago, Comuna de La Florida</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYx8BXckW-u/" target="_blank" rel="noopener">Plumas y Patrimonio – Experiencia de Teatro de Revista</a>
-      <div class="meta">📍 ex Teatro Ópera, Huérfanos 837, Santiago Centro</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Vicuna</span>
-        <span class="date">este domingo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZAznEnRRpQ/" target="_blank" rel="noopener">taller “Descubriendo tu historia familiar”</a>
-      <div class="meta">📍 Biblioteca Isolina Barraza de Estay de Museo Gabriela Mistral </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZAfWHWRIQV/" target="_blank" rel="noopener">Seminario Pontificio Mayor de Santiago</a>
-      <div class="meta">📍 Seminario Pontificio Mayor de Santiago, comuna de La Florida</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">HOY</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZAwzU9vcsC/" target="_blank" rel="noopener">Sonora Palacios</a>
-      <div class="meta">📍  San Isidro 2257, Persa Victor Manuel, Metro Bio Bio</div>
-      <div class="meta price">🎟 GRATIS</div>
-      <div class="conf-wrap" title="Confianza: 92%"><div class="conf" style="width:92%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZAd6PzEbj0/" target="_blank" rel="noopener">mes del patrimonio</a>
-      <div class="meta">📍 Plaza de Armas, explanada frente al edificio Correos de Chile, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY_EEnFOiWM/" target="_blank" rel="noopener">Esta celebración continúa</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">DOMINGO 31 DE MAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYx_mCJRaGU/" target="_blank" rel="noopener">Vacilón Chilenero de Los Frescos</a>
-      <div class="meta">📍 MANUEL </div>
-      
-      <div class="conf-wrap" title="Confianza: 60%"><div class="conf" style="width:60%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-UjX4BxF4/" target="_blank" rel="noopener">Visitas guiadas presenciales y intervenciones</a>
-      <div class="meta">📍 Teatro </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Puntaarenas</span>
-        <span class="date">Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7Y7DcEr_C/" target="_blank" rel="noopener">Dia del Patrimonio Cultural – Punta Arenas</a>
-      <div class="meta">📍 Roca #826, Roca #826, Punta Arenas</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpqsY7HAvw/" target="_blank" rel="noopener">Día de los Patrimonios</a>
-      <div class="meta">📍 Biblioteca Nacional </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Museociudadano</span>
-        <span class="date">Este domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZBOCjfD1Tl/" target="_blank" rel="noopener">Segunda y última jornada del Día del Patrimonio en @museociudadano</a>
-      <div class="meta">📍 Museo Ciudadano Vicuña Mackenna </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-K0GUnKyy/" target="_blank" rel="noopener">Día del Patrimonio – Segunda jornada</a>
-      <div class="meta">📍 Biblioteca Nacional, Salón Gabriela Mistral, pasillo segundo piso del sector Alameda, Sección Chilena, Sala de Información y Catálogo, Sección Periódicos y Microformatos</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-p-wJjzXg/" target="_blank" rel="noopener">Día del Patrimonio</a>
-      <div class="meta">📍 Museo Ciudadano Vicuña Mackenna </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 DEMAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYx22ngBFWY/" target="_blank" rel="noopener">Recorrido patrimonial orientado a relevar la memoria histórica vinculada a los Derechos Humanos</a>
-      <div class="meta">📍 Cementerio General, Barrio Providencia</div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo
-Domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY54OInMolL/" target="_blank" rel="noopener">MONUMENTEANDO EN PAPEL</a>
-      <div class="meta">📍 Interior Cementerio General </div>
-      <div class="meta price">🎟 Actividad gratuita</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxElVglnny/" target="_blank" rel="noopener">Taller de Genealogía</a>
-      <div class="meta">📍 Archivo Nacional Histórico, Miraflores #50, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 de mayo - 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYkxmU2geOm/" target="_blank" rel="noopener">día del patrimonio cultural</a>
-      <div class="meta">📍 teatro municipal </div>
-      <div class="meta price">🎟 gratuito</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">El sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY3HavZFj-S/" target="_blank" rel="noopener">Concierto de Campanas “Santiago Resuena”</a>
-      <div class="meta">📍 Plaza de Armas </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30¥31 DEMAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY54OInMolL/" target="_blank" rel="noopener">Monumenteando en papel</a>
-      <div class="meta">📍 Interior Cementerio General, Cementerio General</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 92%"><div class="conf" style="width:92%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5VMs1Dy2y/" target="_blank" rel="noopener">Día del Patrimonio Cultural</a>
-      <div class="meta">📍 Miraflores 50, Santiago, Miraflores 50, Santiago (estación metro Santa Lucia)</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Este Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DZBGzyelgr0/" target="_blank" rel="noopener">Ceremonia de premiación del concurso literario del Día de los Patrimonios</a>
-      <div class="meta">📍 Cementerio General, Recoleta</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-salKJ0y7/" target="_blank" rel="noopener">Memoria de Víctor Jara en Población Nogales</a>
-      <div class="meta">📍 Av. Padre Vicente Irarrázaval con Colector, Estación Central, Estación Central</div>
-      <div class="meta price">🎟 ENTRADA GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYlDgjBjIKv/" target="_blank" rel="noopener">Ceremonia de premiación del concurso literario “El Cementerio en 204 Palabras”</a>
-      <div class="meta">📍 Cementerio General </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpesGmFlA9/" target="_blank" rel="noopener">Día de los Patrimonios</a>
-      <div class="meta">📍 Librería Amanda Labarca </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY44PtAxAd2/" target="_blank" rel="noopener">exposición de emprendedores de Centro Ideactiva</a>
-      <div class="meta">📍 Nave Central EFE </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5ginUp6hY/" target="_blank" rel="noopener">Presentación artístico cultural + clases de cueca</a>
-      <div class="meta">📍 Plaza Argentina </div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0aAtXuHq6/" target="_blank" rel="noopener">Brujas de Salem</a>
-      <div class="meta">📍 Acceso La Paz – Interior, Cementerio General </div>
-      <div class="meta price">🎟 gratis</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Este 30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5NweQAtHd/" target="_blank" rel="noopener">día del patrimonio</a>
-      <div class="meta">📍  Centro Histórico de Santiago</div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Rancagua</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY45uvtj_Dj/" target="_blank" rel="noopener">Memoria visual de Sewell</a>
-      <div class="meta">📍 Casa de la Cultura de Rancagua, Av. Cachapoal #90</div>
-      <div class="meta price">🎟 Entrada gratuita</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">SABADO 30 Y DOMINGO 31 DE MAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzYOUdmwCE/" target="_blank" rel="noopener">Exhibición del documental “El Guardián de los Andes”</a>
-      <div class="meta">📍 Sala de Cine, Centro de Extensión UC, Av. Lib. Bernardo O'Higgins 390, Santiago</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Valparaiso</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzfqlnFsm8/" target="_blank" rel="noopener">Muestra fotográfica “Atesorando nuestros recuerdos”</a>
-      <div class="meta">📍 Sala Ascensor El Almendral, Acceso desde Plaza de Justicia y Paseo Yugoeslavo</div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Las Condes</span>
-        <span class="date">hasta el 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY95wWHlEaH/" target="_blank" rel="noopener">Aperiódico</a>
-      <div class="meta">📍 Centro Cultural Las Condes, Nuestra Señora del Rosario 30</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 DE MAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzrK3ChKe4/" target="_blank" rel="noopener">El Origen</a>
-      <div class="meta">📍 Cementerio General </div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Puertomontt</span>
-        <span class="date">el sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYfqGs9iWTS/" target="_blank" rel="noopener">Dia del Patrimonio</a>
-      <div class="meta">📍 Biblioteca Regional de Los Lagos, Quillota N°113, Puerto Montt</div>
-      <div class="meta price">🎟 GRATUITO</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2wJTqFam0/" target="_blank" rel="noopener">Ruta Patrimonial Víctor Jara - Memoria, territorio y comunidad</a>
-      <div class="meta">📍 Plaza Argentina (frontis Estación Central), Estación Central</div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 DEMAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxydujNqvL/" target="_blank" rel="noopener">Recorrido Mujeres de nuestra Historia</a>
-      <div class="meta">📍 Cementerio General </div>
-      <div class="meta price">🎟 ENTRADA GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5jCrqJHKn/" target="_blank" rel="noopener">Conversación con el escritor Omar Pérez‑Santiago</a>
-      <div class="meta">📍 Plaza Argentina, Plaza Argentina, Estación Central</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzrThllvpA/" target="_blank" rel="noopener">Descuento 30% en librería física</a>
-      
-      <div class="meta price">🎟 30% de descuento</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">SÁBADO 30DEMAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxur_KO7Dt/" target="_blank" rel="noopener">Recorrido Sociedad y Arquitectura Mortuoria</a>
-      <div class="meta">📍 Cementerio General, La Paz, Recoleta</div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Las Condes</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5PQWVlOqS/" target="_blank" rel="noopener">Día del Patrimonio</a>
-      
-      <div class="meta price">🎟 gratuito</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Iquique</span>
-        <span class="date">este sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0Keqtk0iW/" target="_blank" rel="noopener">MUESTRA DOCUMENTAL “TARAPACÁ EN EL SIGLO XX”</a>
-      <div class="meta">📍 Paseo Baquedano #801 </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 30 y domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYh-WpCNSua/" target="_blank" rel="noopener">FIN DE SEMANA ESPECIAL PATRIMONIOS</a>
-      <div class="meta">📍 San Isidro 2257 </div>
-      <div class="meta price">🎟 Entrada gratuita</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Recoleta</span>
-        <span class="date">Este sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxZwM5EQRP/" target="_blank" rel="noopener">Recorridos patrimoniales en micros clásicas</a>
-      <div class="meta">📍 Plaza La Paz, Av. La Paz 1033, Recoleta</div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpZnvNFua_/" target="_blank" rel="noopener">Día del Patrimonio – visita mediada para personas ciegas y baja visión</a>
-      <div class="meta">📍 Museo Ciudadano, Av. Vicuña Mackenna 94, Providencia</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY91OMDkdpW/" target="_blank" rel="noopener">Patrimonio en Plaza de Armas</a>
-      <div class="meta">📍 Plaza de Armas, centro de Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">SÁBADO 30 DE MAYO 2026 - 16:30 HORAS</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYw_U_JnCiM/" target="_blank" rel="noopener">Banda de Conciertos Santa Clara</a>
-      <div class="meta">📍 Salón central del museo, Parque Quinta Normal, Santiago</div>
-      <div class="meta price">🎟 Actividad gratuita</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31 de mayo, 10:00 a 18:00 hrs</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYujLGRlqeN/" target="_blank" rel="noopener">Visita exhibición permanente de @museociudadano | Día del Patrimonio en @museociudadano</a>
-      <div class="meta">📍 Museo Ciudadano Vicuña Mackenna, Av. Vicuña Mackenna 94, metros Baquedano y Parque Bustamante</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 DE MAYO 31 DE MAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxGsuNJ_tt/" target="_blank" rel="noopener">Día de los Patrimonios – Recorrido Cementerio General</a>
-      <div class="meta">📍 Cementerio General </div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxuu5wD_uf/" target="_blank" rel="noopener">dia del patrimonio cultural</a>
-      <div class="meta">📍 Museo Ciudadano </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 30 y domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY4Y-JPDqfl/" target="_blank" rel="noopener">Día de los Patrimonios en Terrazas San Cristóbal</a>
-      <div class="meta">📍 Mercadito TSC, CONSTITUCIÓN 145, PROVIDENCIA</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYxnGkVGvfk/" target="_blank" rel="noopener">Día del Patrimonio 2026</a>
-      
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYlC3FUDv3T/" target="_blank" rel="noopener">3 Especial Día de los Patrimonios</a>
-      
-      <div class="meta price">🎟 Entrada liberada y sin inscripción</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7fQ6CmSqM/" target="_blank" rel="noopener">Día del Patrimonio en el Museo Nacional de Historia Natural</a>
-      <div class="meta">📍 Museo Nacional de Historia Natural </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado para celebrar la memoria urbana</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5cpiAljOA/" target="_blank" rel="noopener">Bar Unión Chica</a>
-      <div class="meta">📍 Bar Unión Chica, Calle Nueva York 11, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5cpiAljOA/" target="_blank" rel="noopener">Bar Repiola</a>
-      <div class="meta">📍 Bar Repiola, Vicuña Rozas 5032, Quinta Normal</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5cpiAljOA/" target="_blank" rel="noopener">La Milla</a>
-      <div class="meta">📍 La Milla, Nueva Rengifo 381, Recoleta</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7O_fKOI56/" target="_blank" rel="noopener">Día de los Patrimonios en Recoleta</a>
-      <div class="meta">📍  Recoleta</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYfsHhEFkQy/" target="_blank" rel="noopener">Día del Patrimonio</a>
-      <div class="meta">📍 Museo Ciudadano </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYk9VQNMkoN/" target="_blank" rel="noopener">dia del patrimonio santiago 2026</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Desde las 08:00 horas del 30 de mayo hasta las 23:59 del 31 de mayo.</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY9uzObBAfV/" target="_blank" rel="noopener">Giselle</a>
-      <div class="meta">📍 Teatro Municipal </div>
-      <div class="meta price">🎟 ENTRADAS GRATUITAS</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">mañana</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7l9zexAiR/" target="_blank" rel="noopener">Inauguración del mural del capo @grasosobremagro</a>
-      <div class="meta">📍  barrio Triana</div>
-      
-      <div class="conf-wrap" title="Confianza: 60%"><div class="conf" style="width:60%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2KoLbB-1M/" target="_blank" rel="noopener">Día del Patrimonio UAH</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 mayo 2026 / Domingo 31 mayo 2026</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY4zxZSx0l6/" target="_blank" rel="noopener">Punto de Pausa - Visita especial para personas del espectro autista y sus familias</a>
-      <div class="meta">📍 Museo Nacional de Historia Natural, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-UjX4BxF4/" target="_blank" rel="noopener">TMS Magazine</a>
-      <div class="meta">📍 Teatro </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0l25fs8Ob/" target="_blank" rel="noopener">Visita Tribunal Constitucional</a>
-      <div class="meta">📍 Tribunal Constitucional, Huérfanos 1234</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY7rHRDlFa9/" target="_blank" rel="noopener">Patrimonio Sonoro - Ciclo de Escuchas Guiadas</a>
-      <div class="meta">📍 Palacio Letelier, Cienfuegos 51, Barrio Brasil</div>
-      <div class="meta price">🎟 GRATIS</div>
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">solo este sábado 30 y domingo 31</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-HuqVnJDC/" target="_blank" rel="noopener">Visita a los almacenes de la Biblioteca Nacional (Día del Patrimonio)</a>
-      <div class="meta">📍 Biblioteca Nacional </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5ginUp6hY/" target="_blank" rel="noopener">Presentación artístico cultural y clases de cueca – Feria del Libro</a>
-      <div class="meta">📍 Plaza Argentina </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5NweQAtHd/" target="_blank" rel="noopener">Día del Patrimonio - Red de Museos del Centro Histórico</a>
-      <div class="meta">📍  Centro Histórico de Santiago</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5ginUp6hY/" target="_blank" rel="noopener">Feria del Libro de Estación Central</a>
-      <div class="meta">📍 Plaza Argentina </div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago Centro</span>
-        <span class="date">Este 30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5NweQAtHd/" target="_blank" rel="noopener">DÍA DEL PATRIMONIO</a>
-      
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY79ABolVyG/" target="_blank" rel="noopener">Historias desconocidas del Archivo Nacional</a>
-      <div class="meta">📍 Archivo Nacional, Miraflores #50, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5pUV7NUs6/" target="_blank" rel="noopener">Apertura del Palacio Letelier por el Día del Patrimonio</a>
-      <div class="meta">📍 Palacio Letelier, Cienfuegos 51, esq. Erasmo Escala, Barrio Brasil, Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Estacion Central</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzeTnUsYaY/" target="_blank" rel="noopener">Ruta Patrimonial Víctor Jara – “Memoria, territorio y comunidad”</a>
-      <div class="meta">📍 Plaza Argentina (frontis Estación Central) </div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2z3uxhnlZ/" target="_blank" rel="noopener">Inauguración de la exposición “Estrella Distante”</a>
-      <div class="meta">📍 CNAC, Av. Pedro Aguirre Cerda 6100, Metro Cerrillos</div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">hoy y mañana</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-MejVxyOF/" target="_blank" rel="noopener">Visita a la Iglesia de la Recoleta Dominica</a>
-      <div class="meta">📍 Iglesia de la Recoleta Dominica, Recoleta 683</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Recoleta</span>
-        <span class="date">30 y 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY29IleOXMn/" target="_blank" rel="noopener">Recoleta: de la Escuela al Barrio</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5z5L9DNPN/" target="_blank" rel="noopener">Visita al Tribunal Constitucional</a>
-      <div class="meta">📍 Tribunal Constitucional, Huérfanos 1234</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Sábado 30 y domingo 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYm0uXtFm5-/" target="_blank" rel="noopener">dia del patrimonio</a>
-      <div class="meta">📍 Museo Ciudadano, Av. Vicuña Mackenna 94, metros Baquedano y Parque Bustamante</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">30 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY-K0GUnKyy/" target="_blank" rel="noopener">Día del Patrimonio – Primera jornada</a>
-      <div class="meta">📍 Biblioteca Nacional, Salón Gabriela Mistral, pasillo segundo piso del sector Alameda, Sección Chilena, Sala de Información y Catálogo, Sección Periódicos y Microformatos</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY4lNlMlQB6/" target="_blank" rel="noopener">Día de los Patrimonios sorteo</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Viernes 29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY16ppeFdiq/" target="_blank" rel="noopener">Lanzamiento de libro | Faunas Mentales</a>
-      <div class="meta">📍 Biblioteca Nicomedes Guzmán, Riquelme 226, Metro Santa Ana</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Estacion Central</span>
-        <span class="date">Viernes 29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY427wHAtlq/" target="_blank" rel="noopener">Presentación del libro ¿Para qué sirven las estrellas?</a>
-      <div class="meta">📍 Plaza Argentina, Plaza Argentina, Estación Central</div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Viernes 29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY427wHAtlq/" target="_blank" rel="noopener">Presentación del libro "¿Para qué sirven las estrellas?"</a>
-      <div class="meta">📍 Plaza Argentina, Estación Central</div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">miércoles</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2wolwjcay/" target="_blank" rel="noopener">Efecto Cineteca</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 80%"><div class="conf" style="width:80%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">29 DEMAYO</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2OsSXJ8hn/" target="_blank" rel="noopener">Cine al aire libre: El Húsar de la Muerte</a>
-      <div class="meta">📍 Acceso Av. La Paz </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">VIERNES 29, SÁBADO 30 Y DOMINGO 31.</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY24GLlAcxK/" target="_blank" rel="noopener">UN FIN DE SEMANA DE PATRIMONIO Y GASTRONOMÍA EN BELLAVISTA</a>
-      <div class="meta">📍 Terrazas San Cristóbal y La Chascona, Constitución 145, Providencia</div>
-      <div class="meta price">🎟 ENTRADAS GRATUITAS</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Viernes 29 de mayo | 19:00 horas</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYr-baQDQup/" target="_blank" rel="noopener">Los artistas plásticos de Chile + Isla de Pascua</a>
-      <div class="meta">📍 Sala Alicia Vega, Nivel -2</div>
-      <div class="meta price">🎟 Entrada gratuita</div>
-      <div class="conf-wrap" title="Confianza: 100%"><div class="conf" style="width:100%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Este viernes 29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5cpiAljOA/" target="_blank" rel="noopener">recorrido guiado por los bares y restaurantes históricos de Barrio Italia</a>
-      <div class="meta">📍  Barrio Italia</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Desde el 28 al 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5NC8yGI7B/" target="_blank" rel="noopener">La Furia del Libro</a>
-      <div class="meta">📍 Centro Cultural Estación Mapocho, Estación Mapocho</div>
-      
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">28 al 31 de Mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY41mCIkQwE/" target="_blank" rel="noopener">La Furia del Libro – Invierno 2026</a>
-      <div class="meta">📍 Centro Cultural Estación Mapocho </div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">28 al 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2WTzjHM_r/" target="_blank" rel="noopener">Furia del Libro</a>
-      <div class="meta">📍 Biblioteca Nacional de Chile </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Jueves 28 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzovLrli4A/" target="_blank" rel="noopener">Cineforo "Cuerpo celeste"</a>
-      <div class="meta">📍 Cineteca Nacional de Chile, Centro Cultural La Moneda, Nivel -2</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 99%"><div class="conf" style="width:99%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado y domingo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2MRc6FrbF/" target="_blank" rel="noopener">mesa especial de libros patrimoniales</a>
-      <div class="meta">📍 Biblioteca Nacional </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Jueves 28 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY44jLUkyYi/" target="_blank" rel="noopener">CINEFORO – Cuerpo celeste</a>
-      <div class="meta">📍 Cineteca Nacional de Chile, Centro Cultural La Moneda, Nivel -2</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Jueves 28 de mayo | 19:00 horas</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYr-baQDQup/" target="_blank" rel="noopener">Andacollo + San Pedro de Atacama</a>
-      <div class="meta">📍 Sala Alicia Vega, Nivel -2</div>
-      <div class="meta price">🎟 Entrada gratuita</div>
-      <div class="conf-wrap" title="Confianza: 100%"><div class="conf" style="width:100%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">28 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpnOJex1Zh/" target="_blank" rel="noopener">Cineforo post proyección</a>
-      <div class="meta">📍 Cineteca Nacional </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este sábado y domingo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5a35-xfBv/" target="_blank" rel="noopener">Santuario del Padre Hurtado</a>
-      <div class="meta">📍 Santuario del Padre Hurtado, Avenida Padre Hurtado 1090, Estación Central</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este jueves 28 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYyJhlSNTQj/" target="_blank" rel="noopener">función especial de @cuerpoceleste.film</a>
-      <div class="meta">📍 Cineteca Nacional CL </div>
-      <div class="meta price">🎟 GRATIS</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">28 al 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY5NC8yGI7B/" target="_blank" rel="noopener">Biblioteca Nacional en La Furia del Libro</a>
-      <div class="meta">📍 Centro Cultural Estación Mapocho </div>
-      
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Jueves 28 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYm_8vfB-jn/" target="_blank" rel="noopener">Cuerpo celeste</a>
-      <div class="meta">📍 Sala de cine, Nivel -2</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">este Jueves 28 de Mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY2-Pnivmt2/" target="_blank" rel="noopener">Estreno 'Amarga Navidad'</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de Mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYiKx8eTBkJ/" target="_blank" rel="noopener">Presentación #26 de la revista LAFUGA</a>
-      <div class="meta">📍 Sala Alicia Vega, Cineteca Nacional, Plaza de la Ciudadanía 26</div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzghb_nEsG/" target="_blank" rel="noopener">Concierto | Temporada 2026</a>
-      <div class="meta">📍 Biblioteca Nacional de Chile </div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0JlNrzYhY/" target="_blank" rel="noopener">Ciclo de Cine Húngaro – Los que se quedan</a>
-      <div class="meta">📍  Nuestra Señora del Rosario 30</div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYqCv5QiroN/" target="_blank" rel="noopener">“Nouvelle Vague” (2025)</a>
-      <div class="meta">📍 Sala de cine </div>
-      <div class="meta price">🎟 GRATUITA</div>
-      <div class="conf-wrap" title="Confianza: 96%"><div class="conf" style="width:96%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYzghb_nEsG/" target="_blank" rel="noopener">CONCIERTO | Temporada 2026</a>
-      <div class="meta">📍 Biblioteca Nacional de Chile </div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Miércoles 27 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0pvqXCrkK/" target="_blank" rel="noopener">Nouvelle Vague (2025) – estreno</a>
-      <div class="meta">📍 Sala de cine </div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">02:55 am - 26 mayo 2026</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DY0fVqfOnh0/" target="_blank" rel="noopener">Puesta de luna</a>
-      <div class="meta">📍  Santiago</div>
-      
-      <div class="conf-wrap" title="Confianza: 90%"><div class="conf" style="width:90%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Las Condes</span>
-        <span class="date">Hasta el 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYw3RteIzug/" target="_blank" rel="noopener">El hallazgo de un genio</a>
-      <div class="meta">📍 Corporación Cultural de Las Condes </div>
-      <div class="meta price">🎟 gratuita</div>
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">lunes 25 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYpGrmunPg4/" target="_blank" rel="noopener">La Proclama (capítulo de radio)</a>
-      
-      
-      <div class="conf-wrap" title="Confianza: 97%"><div class="conf" style="width:97%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">21 al 29 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYhtZ25ljZP/" target="_blank" rel="noopener">Estrenos Chilenos</a>
-      <div class="meta">📍 Cineteca Nacional </div>
-      <div class="meta price">🎟 Entrada liberada</div>
-      <div class="conf-wrap" title="Confianza: 98%"><div class="conf" style="width:98%"></div></div>
-    </div>
-
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">del 18 al 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYfmZBSHTYD/" target="_blank" rel="noopener">Exposición Itinerante Archivo Nacional</a>
-      <div class="meta">📍 Biblioteca, BARRIO CONCHA Y TORO</div>
-      
-      <div class="conf-wrap" title="Confianza: 95%"><div class="conf" style="width:95%"></div></div>
-    </div>
+  <div class="header">
+    <div class="header-left">
+      <h1>GoTinku</h1>
+      <p class="subtitle">Encuentra qué hacer en Chile</p>
+    </div>
+    <div class="updated" id="updated-info"></div>
+  </div>
+
+  <div class="ai-disclaimer">
+    <span>⚠️</span>
+    <span><strong>Generado con IA.</strong> Verifica los detalles del evento antes de asistir.</span>
+  </div>
+
+  <div id="main">
+    <div class="loading">Cargando eventos...</div>
+  </div>
 
-    <div class="card">
-      <div class="card-header">
-        <span class="city">Santiago</span>
-        <span class="date">Del 7 al 31 de mayo</span>
-      </div>
-      <a class="name" href="https://www.instagram.com/p/DYhsqp7RBjE/" target="_blank" rel="noopener">exposición “bodega”</a>
-      <div class="meta">📍 Espacio Cultural CCEC, Alameda 3470, 4° nivel</div>
-      <div class="meta price">🎟 GRATUITO</div>
-      <div class="conf-wrap" title="Confianza: 99%"><div class="conf" style="width:99%"></div></div>
-    </div></div></section>
   <footer>
     Hecho por <a href="https://github.com/diegocaro" target="_blank" rel="noopener">@diegocaro</a>
-    · generado el 2026-06-01 18:06
   </footer>
+
+  <script>
+    const state = {
+      allEvents: [],
+      timeWindow: 'esta_semana',
+      selectedCities: [],
+      selectedCategories: [],
+      searchQuery: '',
+      searchTimeout: null,
+    };
+
+    function syncStateToURL() {
+      const params = new URLSearchParams();
+      if (state.timeWindow && state.timeWindow !== 'esta_semana') {
+        params.set('tw', state.timeWindow);
+      }
+      if (state.selectedCities.length > 0) {
+        params.set('city', state.selectedCities[0]);
+      }
+      if (state.selectedCategories.length > 0) {
+        params.set('cat', state.selectedCategories[0]);
+      }
+      if (state.searchQuery) {
+        params.set('q', state.searchQuery);
+      }
+      const newURL = params.toString() ? `?${params.toString()}` : window.location.pathname;
+      window.history.replaceState(null, '', newURL);
+    }
+
+    function loadStateFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('tw')) {
+        state.timeWindow = params.get('tw');
+      }
+      if (params.has('city')) {
+        state.selectedCities = [params.get('city')];
+      }
+      if (params.has('cat')) {
+        state.selectedCategories = [params.get('cat')];
+      }
+      if (params.has('q')) {
+        state.searchQuery = params.get('q');
+      }
+    }
+
+    function getToday() {
+      return new Date();
+    }
+
+    function dateFromString(dateStr) {
+      if (!dateStr) return null;
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function getThisSunday(today) {
+      const day = today.getDay();
+      const daysUntilSunday = day === 0 ? 0 : 7 - day;
+      const sunday = new Date(today);
+      sunday.setDate(today.getDate() + daysUntilSunday);
+      return new Date(sunday.getFullYear(), sunday.getMonth(), sunday.getDate());
+    }
+
+    function getNextSunday(today) {
+      const thisSunday = getThisSunday(today);
+      const nextSunday = new Date(thisSunday);
+      nextSunday.setDate(thisSunday.getDate() + 7);
+      return nextSunday;
+    }
+
+    function getTimeWindows(event) {
+      const today = getToday();
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      const dateStart = dateFromString(event.date_start);
+      const dateEnd = dateFromString(event.date_end) || dateStart;
+
+      if (!dateStart || !dateEnd) return [];
+
+      const windows = [];
+
+      // Hoy: today only
+      if (dateStart <= todayDate && dateEnd >= todayDate) {
+        windows.push('hoy');
+      }
+
+      // Esta semana: today to 7 days from now
+      const sevenDaysFromToday = new Date(todayDate);
+      sevenDaysFromToday.setDate(todayDate.getDate() + 6);
+      if (dateEnd >= todayDate && dateStart <= sevenDaysFromToday) {
+        windows.push('esta_semana');
+      }
+
+      // Este mes: today to 30 days from now
+      const thirtyDaysFromToday = new Date(todayDate);
+      thirtyDaysFromToday.setDate(todayDate.getDate() + 29);
+      if (dateEnd >= todayDate && dateStart <= thirtyDaysFromToday) {
+        windows.push('este_mes');
+      }
+
+      // Todos los días: any upcoming event
+      if (dateEnd >= todayDate) {
+        windows.push('proximos');
+      }
+
+      return windows;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '';
+      const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return `${d} ${months[m - 1]}`;
+    }
+
+    function formatDateRange(event) {
+      const start = event.date_start;
+      const end = event.date_end;
+      if (end && end !== start) {
+        return `${formatDate(start)} a ${formatDate(end)}`;
+      }
+      return formatDate(start);
+    }
+
+    function isPastEvent(event) {
+      const today = new Date();
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const eventEnd = dateFromString(event.date_end || event.date_start);
+      return eventEnd && eventEnd < todayDate;
+    }
+
+    function renderCard(event) {
+      const name = event.name || 'Sin nombre';
+      const city = (event.city || '').toUpperCase();
+      const category = event.category || '';
+      const standardDate = formatDateRange(event);
+      const dateText = event.date_text || '';
+      const venue = event.venue || '';
+      const location = event.location || '';
+      const price = event.price || '';
+      const postUrl = event.post_url || '';
+      const confidence = event.confidence || 0;
+      const postUrls = event.post_urls || [];
+
+      const dateTooltip = dateText && !standardDate.toLowerCase().includes(dateText.toLowerCase())
+        ? ` title="${dateText}"`
+        : '';
+
+      const venueLine = venue || location
+        ? `<div class="meta">📍 ${venue}${venue && location ? ',' : ''} ${location}</div>`
+        : '';
+      const categoryLine = category ? `<div class="category">${category}</div>` : '';
+      const priceLine = price ? `<div class="meta price">🎟 ${price}</div>` : '';
+      const sourcesLine = postUrls && postUrls.length > 1
+        ? `<div class="sources">${postUrls.length} fuentes</div>`
+        : '<div></div>';
+
+      const model = event.model || '-';
+      const confidenceTooltip = `Información extraída por IA\nAutoevaluación: ${confidence}\nModelo: ${model}`;
+      const isPast = isPastEvent(event);
+      const cardClass = isPast ? 'card past-event' : 'card';
+
+      return `
+        <div class="${cardClass}">
+          <div class="card-header">
+            <span class="city">${city}</span>
+            <span class="date"${dateTooltip}>${standardDate}</span>
+          </div>
+          <a class="name" href="${postUrl}" target="_blank" rel="noopener">${name}</a>
+          ${categoryLine}
+          ${venueLine}
+          ${priceLine}
+          <div class="card-footer">
+            ${sourcesLine}
+            <div class="confidence" title="${confidenceTooltip}">${Math.round(confidence * 100)}%</div>
+          </div>
+        </div>`;
+    }
+
+    function getFilteredEvents() {
+      let filtered = state.allEvents.filter(event => {
+        const windows = getTimeWindows(event);
+        if (!windows.includes(state.timeWindow)) return false;
+
+        if (state.selectedCities.length > 0 && !state.selectedCities.includes(event.city)) {
+          return false;
+        }
+
+        if (state.selectedCategories.length > 0 && !state.selectedCategories.includes(event.category)) {
+          return false;
+        }
+
+        if (state.searchQuery) {
+          const q = state.searchQuery.toLowerCase();
+          const matchName = (event.name || '').toLowerCase().includes(q);
+          const matchVenue = (event.venue || '').toLowerCase().includes(q);
+          const matchLocation = (event.location || '').toLowerCase().includes(q);
+          if (!matchName && !matchVenue && !matchLocation) return false;
+        }
+
+        return true;
+      });
+
+      const today = getToday();
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      filtered.sort((a, b) => {
+        const aStart = dateFromString(a.date_start);
+        const aEnd = dateFromString(a.date_end) || aStart;
+        const bStart = dateFromString(b.date_start);
+        const bEnd = dateFromString(b.date_end) || bStart;
+
+        const aDaysToEnd = aEnd - todayDate;
+        const bDaysToEnd = bEnd - todayDate;
+        return aDaysToEnd - bDaysToEnd || (aEnd - aStart) - (bEnd - bStart);
+      });
+
+      return filtered;
+    }
+
+    function getUniqueCities() {
+      const cities = new Set(state.allEvents.map(e => e.city).filter(Boolean));
+      return Array.from(cities).sort();
+    }
+
+    function getUniqueCategories() {
+      const cats = new Set(state.allEvents.map(e => e.category).filter(Boolean));
+      return Array.from(cats).sort();
+    }
+
+    function renderTimeWindows() {
+      const timeWindows = [
+        { id: 'hoy', label: 'Hoy' },
+        { id: 'esta_semana', label: 'Esta semana' },
+        { id: 'este_mes', label: 'Este mes' },
+        { id: 'proximos', label: 'Próximos' },
+      ];
+
+      let html = '<div class="time-window-section">';
+      html += '<div class="time-window-search"><input type="text" id="search-input" placeholder="Nombre, lugar, ubicación..." value="' + (state.searchQuery || '') + '"><button class="search-button" id="search-btn" type="button">🔍</button></div>';
+      html += '<div class="time-tabs">';
+      for (const tw of timeWindows) {
+        const active = tw.id === state.timeWindow ? 'active' : '';
+        html += `<button class="time-tab ${active}" data-time="${tw.id}">${tw.label}</button>`;
+      }
+      html += '</div></div>';
+      return html;
+    }
+
+    function renderControls(cities, categories) {
+      let html = '<div class="controls">';
+      html += '<div class="control-row">';
+      html += '<div><label>Ciudad:</label><br>';
+      html += '<select id="city-filter"><option value="" ' + (state.selectedCities.length === 0 ? 'selected' : '') + '>Todas</option>';
+      for (const city of cities) {
+        const selected = state.selectedCities.includes(city) ? 'selected' : '';
+        html += `<option value="${city}" ${selected}>${city.toUpperCase()}</option>`;
+      }
+      html += '</select></div>';
+      html += '</div>';
+
+      if (categories.length > 0) {
+        html += '<div class="control-row">';
+        html += '<div style="flex: 1;"><div class="categories">';
+        for (const cat of categories) {
+          const active = state.selectedCategories.includes(cat) ? 'active' : '';
+          html += `<button class="category-pill ${active}" data-category="${cat}">${cat}</button>`;
+        }
+        html += '</div></div>';
+        html += '</div>';
+      }
+
+      html += '</div>';
+      return html;
+    }
+
+    function getDateRangeForWindow(windowId) {
+      const today = getToday();
+      const todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const months = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+      let startDate, endDate;
+      if (windowId === 'hoy') {
+        startDate = todayDate;
+        endDate = todayDate;
+      } else if (windowId === 'esta_semana') {
+        startDate = todayDate;
+        endDate = new Date(todayDate);
+        endDate.setDate(todayDate.getDate() + 6);
+      } else if (windowId === 'este_mes') {
+        startDate = todayDate;
+        endDate = new Date(todayDate);
+        endDate.setDate(todayDate.getDate() + 29);
+      } else if (windowId === 'proximos') {
+        return `${todayDate.getDate()} ${months[todayDate.getMonth()]}+`;
+      }
+
+      const formatDateShort = (d) => `${d.getDate()} ${months[d.getMonth()]}`;
+      if (startDate.getTime() === endDate.getTime()) {
+        return formatDateShort(startDate);
+      }
+      return `${formatDateShort(startDate)} - ${formatDateShort(endDate)}`;
+    }
+
+    function renderResults(filtered, timeWindowLabel, timeWindowId, sectionClass) {
+      let html = '';
+      const dateRange = getDateRangeForWindow(timeWindowId);
+      if (filtered.length === 0) {
+        html += `<section class="${sectionClass}"><h2>Sin eventos</h2><p class="empty">No hay eventos que coincidan con los filtros seleccionados</p></section>`;
+      } else {
+        const cards = filtered.map(renderCard).join('\n');
+        html += `<section class="${sectionClass}"><h2>${timeWindowLabel}: ${dateRange} <span class="count">(${filtered.length})</span></h2><div class="grid">${cards}</div></section>`;
+      }
+      return html;
+    }
+
+    function renderMain(fullRender = false) {
+      const filtered = getFilteredEvents();
+      const cities = getUniqueCities();
+      const categories = getUniqueCategories();
+      const timeWindows = [
+        { id: 'hoy', label: 'Hoy' },
+        { id: 'esta_semana', label: 'Esta semana' },
+        { id: 'este_mes', label: 'Este mes' },
+        { id: 'proximos', label: 'Próximos' },
+      ];
+
+      const sectionClass = '';
+      const timeWindowLabel = timeWindows.find(tw => tw.id === state.timeWindow)?.label || '';
+
+      let html = '';
+
+      // Always render time windows (they're sticky at top)
+      html += renderTimeWindows();
+
+      // Only re-render controls on full render (city/category change)
+      if (fullRender) {
+        html += renderControls(cities, categories);
+      }
+
+      html += renderResults(filtered, timeWindowLabel, state.timeWindow, sectionClass);
+
+      if (fullRender) {
+        document.getElementById('main').innerHTML = html;
+        attachEventListeners();
+      } else {
+        // Only update the results section (not time windows - preserves search input focus)
+        const resultsContainer = document.querySelector('#main section');
+        if (resultsContainer) {
+          resultsContainer.outerHTML = renderResults(filtered, timeWindowLabel, state.timeWindow, sectionClass);
+        }
+      }
+    }
+
+    function attachEventListeners() {
+      document.querySelectorAll('.time-tab').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          state.timeWindow = e.target.dataset.time;
+          syncStateToURL();
+          renderMain(true);
+        });
+      });
+
+      const cityFilter = document.getElementById('city-filter');
+      if (cityFilter) {
+        cityFilter.addEventListener('change', (e) => {
+          state.selectedCities = e.target.value ? [e.target.value] : [];
+          syncStateToURL();
+          renderMain(true);
+        });
+      }
+
+      document.querySelectorAll('.category-pill').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const cat = e.target.dataset.category;
+          // Single-select: if already selected, deselect; otherwise, select only this one
+          if (state.selectedCategories.includes(cat)) {
+            state.selectedCategories = [];
+          } else {
+            state.selectedCategories = [cat];
+          }
+          syncStateToURL();
+          renderMain(true);
+        });
+      });
+
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          clearTimeout(state.searchTimeout);
+          state.searchQuery = e.target.value;
+          state.searchTimeout = setTimeout(() => {
+            syncStateToURL();
+            renderMain(false);
+          }, 300);
+        });
+      }
+
+      const searchBtn = document.getElementById('search-btn');
+      if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+          searchInput?.focus();
+        });
+      }
+    }
+
+    async function init() {
+      try {
+        loadStateFromURL();
+        const response = await fetch('data/events.json');
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+        const data = await response.json();
+        state.allEvents = data.events || [];
+
+        if (state.allEvents.length === 0) {
+          document.getElementById('main').innerHTML = '<p class="empty">No hay eventos disponibles</p>';
+          return;
+        }
+
+        renderMain(true);
+
+        const updatedInfo = document.getElementById('updated-info');
+        if (data.generated_at) {
+          updatedInfo.innerHTML = `Actualizado:<br>${data.generated_at}`;
+        }
+      } catch (error) {
+        console.error('Error loading events:', error);
+        document.getElementById('main').innerHTML = `<div class="error">Error al cargar eventos: ${error.message}</div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
